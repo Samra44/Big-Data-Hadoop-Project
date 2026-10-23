@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: earthscape-climate-agency
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /login

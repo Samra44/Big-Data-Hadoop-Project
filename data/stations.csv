@@ -1,0 +1,13 @@
+station_id,station_name,region,latitude,longitude,elevation_m,base_temp,temp_amp,rain_index
+ST01,Karachi,Sindh,24.86,67.01,8,26.5,6.5,0.6
+ST02,Hyderabad,Sindh,25.4,68.37,13,28.0,9.0,0.4
+ST03,Sukkur,Sindh,27.7,68.86,67,27.5,11.0,0.3
+ST04,Lahore,Punjab,31.55,74.34,217,24.5,10.5,1.7
+ST05,Multan,Punjab,30.2,71.47,122,26.5,11.0,0.6
+ST06,Faisalabad,Punjab,31.45,73.13,184,25.0,10.5,1.0
+ST07,Islamabad,Federal,33.68,73.05,540,21.5,9.5,3.2
+ST08,Peshawar,Khyber Pakhtunkhwa,34.01,71.58,331,23.0,10.0,1.4
+ST09,Swat,Khyber Pakhtunkhwa,35.22,72.43,980,17.0,9.0,3.0
+ST10,Quetta,Balochistan,30.18,66.97,1680,16.5,11.5,0.7
+ST11,Gwadar,Balochistan,25.12,62.33,10,26.0,5.0,0.3
+ST12,Gilgit,Gilgit-Baltistan,35.92,74.31,1500,15.5,11.5,0.4

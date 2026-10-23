@@ -1,0 +1,10 @@
+{% extends 'base.html' %}{% block content %}
+<h3>Feedback &amp; Support</h3>
+<div class="row g-3"><div class="col-lg-4"><div class="card card-body"><h6>New ticket</h6><form method="post">
+<select name="category" class="form-select mb-2"><option>Assistance</option><option>Report an issue</option><option>Data quality</option><option>Feature request</option><option>Feedback</option></select>
+<input name="subject" class="form-control mb-2" placeholder="Subject" required><textarea name="message" class="form-control mb-2" rows="5" placeholder="Describe your request" required></textarea>
+<button class="btn btn-es w-100">Submit</button></form></div></div>
+<div class="col-lg-8"><table class="table table-sm bg-white"><thead><tr><th>#</th><th>User</th><th>Category</th><th>Subject</th><th>Message</th><th>Status</th><th>Reply</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{r.id}}</td><td>{{r.username}}</td><td>{{r.category}}</td><td>{{r.subject}}</td><td class="small">{{r.message}}</td><td>{{r.status}}</td>
+<td>{% if session.role=='admin' %}<form method="post" class="d-flex gap-1"><input type="hidden" name="reply_id" value="{{r.id}}"><input name="reply" class="form-control form-control-sm" value="{{r.reply or ''}}"><select name="status" class="form-select form-select-sm"><option>Open</option><option>In progress</option><option>Resolved</option></select><button class="btn btn-sm btn-outline-primary">Save</button></form>{% else %}{{r.reply or '–'}}{% endif %}</td></tr>
+{% else %}<tr><td colspan="7">No tickets yet.</td></tr>{% endfor %}</tbody></table></div></div>{% endblock %}

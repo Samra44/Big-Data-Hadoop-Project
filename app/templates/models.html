@@ -1,0 +1,24 @@
+{% extends 'base.html' %}{% block content %}
+<h3>Model Management</h3>
+<div class="row g-3 mb-3"><div class="col-md-5"><div class="card card-body"><h6>Runtime environment (auto-detected)</h6><table class="table table-sm mb-0">
+{% for k,v in runtime.items() %}<tr><td>{{k}}</td><td>{{v}}</td></tr>{% endfor %}<tr><td>scikit-learn</td><td>{{b.runtime.sklearn}}</td></tr></table></div></div>
+<div class="col-md-7"><div class="card card-body"><div class="d-flex justify-content-between"><h6>Active: v{{b.version}}</h6>
+<form method="post"><button class="btn btn-es btn-sm" name="action" value="retrain">⟳ Retrain on latest data</button></form></div>
+<p class="small mb-1">Trained {{b.trained_at}} · {{"{:,}".format(b.n_rows)}} readings · {{b.date_range[0]}} → {{b.date_range[1]}} · {{b.train_seconds}} s · <i>{{b.reason}}</i></p>
+<table class="table table-sm mb-0"><tr><th>Next-day temperature forecast</th><td>{{b.metrics.forecast.best}}</td><td>MAE {{b.metrics.forecast.test_mae}} °C · R² {{b.metrics.forecast.test_r2}} · naive MAE {{b.metrics.forecast.persistence_mae}}</td></tr>
+<tr><th>Extreme-event classifier</th><td>{{b.metrics.event.best}}</td><td>macro-F1 {{b.metrics.event.test_f1_macro}} · accuracy {{(b.metrics.event.test_accuracy*100)|round(1)}}%</td></tr>
+<tr><th>Anomaly detector</th><td>IsolationForest + z-score</td><td>precision {{b.metrics.anomaly.precision}} · recall {{b.metrics.anomaly.recall}}</td></tr>
+<tr><th>Trend analysis</th><td>Linear regression</td><td>+{{b.metrics.trends_mean_c_per_decade}} °C/decade</td></tr></table>
+<div id="tstat" class="small text-muted mt-2"></div></div></div></div>
+<div class="row g-3 mb-3"><div class="col-md-4"><div class="card card-body"><h6>Forecast – CV MAE (lower is better)</h6><canvas id="c1"></canvas></div></div>
+<div class="col-md-4"><div class="card card-body"><h6>Events – CV macro-F1</h6><canvas id="c2"></canvas></div></div>
+<div class="col-md-4"><div class="card card-body"><h6>Events – F1 per class (hold-out)</h6><canvas id="c3"></canvas></div></div></div>
+<h5>Version history</h5><table class="table table-sm bg-white"><thead><tr><th>Version</th><th>Trained</th><th>Readings</th><th>Reason</th><th>Forecast MAE</th><th>Event F1</th><th>sklearn</th><th></th></tr></thead><tbody>
+{% for v in versions %}<tr class="{{'table-success' if v.version==b.version}}"><td>v{{v.version}}</td><td>{{v.trained_at}}</td><td>{{"{:,}".format(v.n_rows)}}</td><td>{{v.reason}}</td><td>{{v.metrics.forecast.test_mae}}</td><td>{{v.metrics.event.test_f1_macro}}</td><td>{{v.runtime.sklearn}}</td>
+<td>{% if v.version!=b.version %}<form method="post"><input type="hidden" name="version" value="{{v.version}}"><button class="btn btn-sm btn-outline-primary" name="action" value="activate">Activate</button></form>{% else %}<span class="badge bg-success">active</span>{% endif %}</td></tr>{% endfor %}</tbody></table>
+<script>const m={{b.metrics|tojson}};
+new Chart(c1,{type:'bar',data:{labels:Object.keys(m.forecast.cv_mae),datasets:[{label:'MAE °C',data:Object.values(m.forecast.cv_mae),backgroundColor:'#138a72'}]}});
+new Chart(c2,{type:'bar',data:{labels:Object.keys(m.event.cv_f1_macro),datasets:[{label:'macro-F1',data:Object.values(m.event.cv_f1_macro),backgroundColor:'#e8590c'}]}});
+new Chart(c3,{type:'bar',data:{labels:Object.keys(m.event.per_class_f1),datasets:[{label:'F1',data:Object.values(m.event.per_class_f1),backgroundColor:'#1c7ed6'}]}});
+let was=false; async function poll(){const t=await (await fetch('{{ url_for("api_training") }}')).json(); tstat.textContent=t.training?'Training… '+t.progress:(t.error?'Last error: '+t.error:t.progress); if(was&&!t.training)location.reload(); was=t.training;}
+poll(); setInterval(poll,2000);</script>{% endblock %}

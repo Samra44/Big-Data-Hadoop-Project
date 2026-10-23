@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block content %}
+<h3>Backups</h3>
+<div class="card card-body mb-3"><p class="mb-1">Automated backup every <b>{{every}} h</b>, last <b>{{keep}}</b> kept · encryption: <b>{{'AES (Fernet) – key stored separately' if encrypted else 'off (pip install cryptography to enable)'}}</b></p>
+<p class="small text-muted">Folder: <code>{{folder}}</code></p><form method="post"><button class="btn btn-es">Back up now</button></form></div>
+<table class="table table-sm bg-white"><thead><tr><th>File</th><th>Size (MB)</th><th></th></tr></thead><tbody>
+{% for f in files %}<tr><td>{{f.name}}</td><td>{{f.mb}}</td><td><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('backup_download', name=f.name) }}">Download</a></td></tr>{% else %}<tr><td colspan="3">No backups yet.</td></tr>{% endfor %}</tbody></table>
+<p class="small text-muted">Restore: <code>python restore_backup.py &lt;file&gt;</code> (decrypts with the key and rebuilds the database).</p>{% endblock %}

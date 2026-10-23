@@ -1,0 +1,15 @@
+{% extends 'base.html' %}{% block content %}
+<h3>Data Ingestion</h3>
+<div class="row g-3"><div class="col-lg-6"><div class="card card-body"><h6>Batch upload (historical or recent)</h6>
+<form method="post" enctype="multipart/form-data"><input type="file" name="file" class="form-control mb-2" accept=".csv,.txt,.json,.xlsx,.xls,.parquet,.nc" required>
+<select name="mode" class="form-select mb-2"><option value="historical_upload">Historical archive</option><option value="station_upload">Weather-station batch</option><option value="sensor_upload">Environmental-sensor batch</option><option value="satellite_upload">Satellite product</option></select>
+<div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="dedupe" value="1" checked id="dd"><label class="form-check-label" for="dd">Remove duplicate station/date rows</label></div>
+<button class="btn btn-es">Upload &amp; process</button></form>
+<p class="small text-muted mt-2 mb-0">Formats: CSV, TXT, JSON, Excel, Parquet, NetCDF (.nc). Required columns: <code>station_id</code>, <code>date</code>. Any of the 12 climate metrics may be present; missing ones are imputed. Station metadata is filled from the station registry.</p></div></div>
+<div class="col-lg-6"><div class="card card-body"><h6>Real-time sources</h6>
+<p class="small mb-1"><b>REST API</b> – POST JSON (one object or a list) to <code>/api/ingest</code> with header <code>X-API-Key</code>.</p>
+<pre class="small bg-light p-2">curl -X POST http://127.0.0.1:5000/api/ingest -H "X-API-Key: earthscape-demo-key" -H "Content-Type: application/json" -d "{\"station_id\":\"ST01\",\"date\":\"2024-07-01\",\"temperature_c\":44.5,\"wind_speed_kmh\":20}"</pre>
+<p class="small mb-1"><b>Sensor simulator</b> – <code>python simulator.py --rate 2 --batch 12</code></p>
+<p class="small mb-0"><b>Built-in live stream</b> – button on the Dashboard. Production: Kafka → Spark Structured Streaming (see <code>hadoop/</code>).</p></div></div></div>
+<h5 class="mt-4">Recent ingestion jobs</h5><table class="table table-sm bg-white"><thead><tr><th>Time</th><th>Job</th><th>Records</th><th>Seconds</th><th>Detail</th></tr></thead><tbody>
+{% for j in jobs %}<tr><td>{{j.created}}</td><td>{{j.job}}</td><td>{{"{:,}".format(j.records)}}</td><td>{{j.seconds}}</td><td>{{j.detail}}</td></tr>{% endfor %}</tbody></table>{% endblock %}

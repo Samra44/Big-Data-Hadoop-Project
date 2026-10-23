@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+app/.env
+app/*.db
+ml/registry/
+backups/

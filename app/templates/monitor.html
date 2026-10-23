@@ -1,0 +1,19 @@
+{% extends 'base.html' %}{% block content %}
+<h3>System &amp; Data Monitoring <small class="text-muted fs-6">refreshes every 5 s</small></h3>
+<div class="row g-3 mb-3" id="sys"></div>
+<div class="row g-3 mb-3"><div class="col-lg-6"><div class="card card-body"><h6>Response time per endpoint (ms)</h6><canvas id="lat"></canvas></div></div>
+<div class="col-lg-6"><div class="card card-body"><h6>Data drift – latest {{n}} readings vs historical archive (PSI)</h6><canvas id="psi"></canvas>
+<p class="small text-muted mb-0">PSI &lt; 0.10 stable · 0.10–0.25 moderate · &gt; 0.25 drift → retrain recommended.</p></div></div></div>
+<table class="table table-sm bg-white"><thead><tr><th>Metric</th><th>Archive mean</th><th>Recent mean</th><th>PSI</th><th>Status</th></tr></thead><tbody>
+{% for r in drift %}<tr><td>{{r.metric}}</td><td>{{r.ref}}</td><td>{{r.recent}}</td><td>{{r.psi}}</td><td><span class="badge {{'bg-success' if r.status=='Stable' else 'bg-warning text-dark' if r.status=='Moderate' else 'bg-danger'}}">{{r.status}}</span></td></tr>{% endfor %}</tbody></table>
+<h5>Processing jobs</h5><table class="table table-sm bg-white"><thead><tr><th>Time</th><th>Job</th><th>Records</th><th>Seconds</th><th>Records/s</th><th>Detail</th></tr></thead><tbody>
+{% for j in jobs %}<tr><td>{{j.created}}</td><td>{{j.job}}</td><td>{{j.records}}</td><td>{{j.seconds}}</td><td>{{ (j.records/j.seconds)|round|int if j.seconds else '–' }}</td><td>{{j.detail}}</td></tr>{% endfor %}</tbody></table>
+<script>const dr={{drift|tojson}};
+new Chart(psi,{type:'bar',data:{labels:dr.map(r=>r.metric),datasets:[{label:'PSI',data:dr.map(r=>r.psi),backgroundColor:dr.map(r=>r.psi<.1?'#138a72':r.psi<.25?'#f2b134':'#b42318')}]}});
+let lc; async function load(){const d=await (await fetch('{{ url_for("api_system") }}')).json(); const s=d.system;
+ const tiles=[['CPU',s.cpu!=null?s.cpu+'%':'n/a'],['RAM',s.ram!=null?s.ram+'%':'n/a'],['Disk',s.disk!=null?s.disk+'%':'n/a'],['App memory',s.proc_mb?s.proc_mb+' MB':'n/a'],['Uptime',d.uptime_h+' h'],['DB size',d.db_mb+(typeof d.db_mb=='number'?' MB':'')],['Readings',d.rows.toLocaleString()],['Ingest speed',(d.throughput.rps??'–')+' rec/s']];
+ sys.innerHTML=tiles.map(([l,v])=>`<div class="col-6 col-md-3 col-xl"><div class="card kpi"><div class="card-body py-2"><div class="small text-muted">${l}</div><div class="fs-5 fw-bold">${v}</div></div></div></div>`).join('');
+ const L=Object.entries(d.latency).sort((a,b)=>b[1].avg-a[1].avg).slice(0,10);
+ const data={labels:L.map(x=>x[0]),datasets:[{label:'avg',data:L.map(x=>x[1].avg),backgroundColor:'#138a72'},{label:'p95',data:L.map(x=>x[1].p95),backgroundColor:'#adb5bd'}]};
+ if(lc){lc.data=data;lc.update('none');} else lc=new Chart(lat,{type:'bar',data,options:{indexAxis:'y',animation:false}});}
+load(); setInterval(load,5000);</script>{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+<h3 class="mb-0">Climate Intelligence Dashboard <small class="text-muted fs-6">live · refreshes every 5 s · <span id="clock"></span></small></h3>
+<div>{% if session.role in ['admin','analyst'] %}<button id="sb" class="btn btn-outline-danger btn-sm" onclick="toggleStream()">▶ Start live sensor stream</button>
+<a class="btn btn-outline-secondary btn-sm" href="{{ url_for('export') }}">⬇ Export CSV</a>{% endif %}</div></div>
+<div id="trainBanner" class="alert alert-info d-none"></div>
+<div class="row g-3 mb-3" id="kpis"></div>
+<div class="row g-3">
+<div class="col-lg-6"><div class="card card-body"><h6>Warming trend – annual mean temperature & CO₂</h6><canvas id="annual"></canvas></div></div>
+<div class="col-lg-6"><div class="card card-body"><h6>Extreme events per year</h6><canvas id="events"></canvas></div></div>
+<div class="col-lg-6"><div class="card card-body"><h6>Tomorrow's temperature forecast by station (ML)</h6><canvas id="fc"></canvas></div></div>
+<div class="col-lg-6"><div class="card card-body"><h6>12-month regional temperature outlook</h6><canvas id="outlook"></canvas></div></div>
+<div class="col-lg-8"><div class="card card-body"><h6>Latest incoming readings</h6><div class="table-responsive">
+<table class="table table-sm mb-0"><thead><tr><th>Station</th><th>Date</th><th>Temp °C</th><th>Rain mm</th><th>Wind</th><th>PM2.5</th><th>Predicted event</th><th>Anomaly</th><th>Source</th></tr></thead><tbody id="recent"></tbody></table></div></div></div>
+<div class="col-lg-4"><div class="card card-body"><h6>Active models</h6><div id="model"></div></div></div>
+</div>
+<script>
+const C={}; let since=null;
+const mk=(id,type,data,opt={})=>{ if(C[id]){C[id].data=data;C[id].update('none');} else C[id]=new Chart(document.getElementById(id),{type,data,options:Object.assign({animation:false,responsive:true},opt)}); };
+const evc={heatwave:'#e8590c',flood:'#1c7ed6',storm:'#7048e8',smog:'#868e96'};
+function toast(a){const d=document.createElement('div');d.className='toast show mb-2';d.innerHTML=`<div class="toast-header lvl-${a.level}"><strong class="me-auto">⚠ ${a.level} alert</strong><button class="btn-close" onclick="this.closest('.toast').remove()"></button></div><div class="toast-body">${a.station_id} · ${a.region} · ${a.date}<br>${a.rule}: <b>${(+a.value).toFixed(1)}</b></div>`;document.getElementById('toasts').appendChild(d);setTimeout(()=>d.remove(),9000);}
+async function refresh(){
+ const d=await (await fetch('{{ url_for("api_stats") }}'+(since!==null?'?since='+since:''))).json(); const k=d.kpi;
+ if(since!==null) d.new_alerts.reverse().forEach(toast); since=d.max_alert;
+ clock.textContent=d.server_time;
+ kpis.innerHTML=[['Readings',k.n.toLocaleString()],['Stations',k.stations],['Latest data',k.last_date],['Avg temp (30 d)',k.t30+' °C'],['vs normal (σ)',(k.dev30>0?'+':'')+k.dev30],['Anomalies (30 d)',k.anom30??0],['Event readings (30 d)',k.ev30??0],['Open alerts',k.open_alerts]]
+  .map(([l,v])=>`<div class="col-6 col-md-3 col-xl"><div class="card kpi"><div class="card-body py-2"><div class="text-muted small">${l}</div><div class="fs-4 fw-bold">${v}</div></div></div></div>`).join('');
+ mk('annual','line',{labels:d.annual.map(r=>r.y),datasets:[{label:'Mean temp °C',data:d.annual.map(r=>r.t),borderColor:'#e8590c',yAxisID:'y'},{label:'CO₂ ppm',data:d.annual.map(r=>r.co2),borderColor:'#0b4f4a',yAxisID:'y1'}]},{scales:{y1:{position:'right',grid:{display:false}}}});
+ const yrs=[...new Set(d.events.map(r=>r.y))], types=Object.keys(evc);
+ mk('events','bar',{labels:yrs,datasets:types.map(t=>({label:t,backgroundColor:evc[t],data:yrs.map(y=>(d.events.find(r=>r.y==y&&r.e==t)||{c:0}).c)}))},{scales:{x:{stacked:true},y:{stacked:true}}});
+ mk('fc','bar',{labels:d.forecast.map(r=>r.station),datasets:[{label:'Latest °C',data:d.forecast.map(r=>r.today),backgroundColor:'#adb5bd'},{label:'Forecast tomorrow °C',data:d.forecast.map(r=>r.tomorrow),backgroundColor:'#138a72'}]});
+ mk('outlook','line',{labels:d.outlook_labels,datasets:Object.entries(d.outlook).map(([k,v])=>({label:k,data:v}))});
+ recent.innerHTML=d.recent.map(r=>`<tr><td>${r.station_name}</td><td>${r.date}</td><td>${r.temperature_c??'–'}</td><td>${r.precipitation_mm??'–'}</td><td>${r.wind_speed_kmh??'–'}</td><td>${r.pm25_ugm3??'–'}</td><td>${r.pred_event=='none'?'<span class="text-muted">none</span>':`<span class="badge" style="background:${evc[r.pred_event]}">${r.pred_event} ${Math.round(r.event_prob*100)}%</span>`}</td><td>${r.pred_anomaly?'⚠️':''}</td><td class="small">${r.ingest_source}</td></tr>`).join('');
+ const m=d.model; model.innerHTML=`<p class="mb-1">Version <b>v${m.version}</b> · ${m.trained_at}</p>
+  <p class="mb-1">Forecast: <b>${m.fc.best}</b> · MAE <b>${m.fc.test_mae} °C</b> (naive ${m.fc.persistence_mae}) · R² ${m.fc.test_r2}</p>
+  <p class="mb-1">Events: <b>${m.ev.best}</b> · macro-F1 <b>${m.ev.test_f1_macro}</b></p>
+  <p class="mb-1">Warming: <b>+${m.trend} °C/decade</b> average across stations</p>
+  <p class="small text-muted mb-0">Auto-retrain after ${d.stream.retrain_every} new readings (now ${d.stream.since_retrain}).</p>`;
+ const tb=trainBanner; if(d.stream.training){tb.classList.remove('d-none');tb.textContent='Retraining: '+d.stream.progress;} else tb.classList.add('d-none');
+ const sb=document.getElementById('sb'); if(sb){sb.dataset.on=d.stream.running;sb.textContent=d.stream.running?`■ Stop live stream (${d.stream.count})`:'▶ Start live sensor stream';}
+}
+async function toggleStream(){await fetch('/api/stream/'+(sb.dataset.on==='true'?'stop':'start'),{method:'POST'});refresh();}
+refresh(); setInterval(refresh,5000);
+</script>{% endblock %}

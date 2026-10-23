@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-2"><h3 class="mb-0">Station Network Map</h3>
+<select id="metric" class="form-select w-auto" onchange="draw()">{% for k,v in metric_labels.items() %}<option value="{{k}}">{{v}}</option>{% endfor %}</select></div>
+<p class="text-muted small">Latest reading per station · colour = value · red ring = anomaly or predicted extreme event · refreshes every 10 s</p>
+<div id="map"></div>
+<script>
+const map=L.map('map').setView([30.2,69.3],5); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+let layer=L.layerGroup().addTo(map), data=[];
+function col(v,min,max){const t=Math.max(0,Math.min(1,(v-min)/((max-min)||1)));return `hsl(${(1-t)*220},75%,48%)`;}
+function draw(){layer.clearLayers(); const m=metric.value; const vs=data.map(r=>r[m]).filter(v=>v!=null); const mn=Math.min(...vs),mx=Math.max(...vs);
+ data.forEach(r=>{const alert=r.pred_anomaly||r.pred_event!='none';
+  L.circleMarker([r.latitude,r.longitude],{radius:14,fillColor:r[m]==null?'#ccc':col(r[m],mn,mx),fillOpacity:.85,color:alert?'#b42318':'#fff',weight:alert?4:2}).addTo(layer)
+   .bindPopup(`<b>${r.station_name}</b> (${r.region})<br>${r.date}<br>Temp ${r.temperature_c} °C · Rain ${r.precipitation_mm} mm<br>Wind ${r.wind_speed_kmh} km/h · PM2.5 ${r.pm25_ugm3}<br>CO₂ ${r.co2_ppm} ppm · NDVI ${r.ndvi}<br>Event: <b>${r.pred_event}</b> (${Math.round(r.event_prob*100)}%) ${r.pred_anomaly?'· ⚠ anomaly':''}`)
+   .bindTooltip(`${r.station_name}: ${r[m]??'–'}`,{permanent:true,direction:'right',offset:[12,0]});});}
+async function load(){data=(await (await fetch('{{ url_for("api_stats") }}')).json()).latest; draw();}
+load(); setInterval(load,10000);
+</script>{% endblock %}

@@ -1,0 +1,13 @@
+station_id,station_name,region,temp_c_per_decade,co2_ppm_per_year
+ST01,Karachi,Sindh,0.44,2.39
+ST02,Hyderabad,Sindh,0.67,2.4
+ST03,Sukkur,Sindh,0.29,2.38
+ST04,Lahore,Punjab,0.71,2.4
+ST05,Multan,Punjab,0.4,2.39
+ST06,Faisalabad,Punjab,0.14,2.41
+ST07,Islamabad,Federal,0.54,2.39
+ST08,Peshawar,Khyber Pakhtunkhwa,0.36,2.4
+ST09,Swat,Khyber Pakhtunkhwa,0.15,2.42
+ST10,Quetta,Balochistan,0.32,2.41
+ST11,Gwadar,Balochistan,0.56,2.41
+ST12,Gilgit,Gilgit-Baltistan,0.36,2.4

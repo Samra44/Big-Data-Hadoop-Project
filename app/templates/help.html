@@ -1,0 +1,15 @@
+{% extends 'base.html' %}{% block content %}
+<h3>Help, FAQ &amp; Tutorials</h3>
+<div class="accordion" id="faq">
+{% for qn, a in [
+("How do I read the dashboard?","KPIs at the top summarise the data store and the last 30 days. 'vs normal (σ)' shows how far temperatures are from the station's usual level for that month. Charts refresh every 5 seconds; new Critical/High alerts pop up at the bottom right."),
+("How do I upload data?","Ingestion → choose a CSV/JSON/Excel/Parquet/NetCDF file with station_id and date columns → Upload. Results show how many anomalies and extreme-event readings were detected."),
+("What does the event probability mean?","The probability (0–100%) that the reading belongs to an extreme event (heatwave, flood, storm or smog) according to the classifier."),
+("How are anomalies detected?","Each reading is compared with the station's normal for that month (z-score) and scored by an Isolation Forest. A reading is flagged if either method finds it unusual."),
+("How do I change alert thresholds?","Alert Rules → edit the threshold and Save, add a new rule for a metric/region, or disable a rule. Changes apply immediately to new readings."),
+("How often are models updated?","Automatically after a configurable number of new readings (default 2,000) and on demand from the Models page. Each run creates a new version that can be rolled back."),
+("What if data is missing?","Missing values are imputed with medians inside the models, lag features are forward-filled and station metadata is completed from the registry, so incomplete records are still processed."),
+("Who can see what?","Administrators manage users and backups; Analysts ingest data, run predictions and manage rules and models; Viewers see dashboards, maps and alerts.")] %}
+<div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#f{{loop.index}}">{{qn}}</button></h2>
+<div id="f{{loop.index}}" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body">{{a}}</div></div></div>{% endfor %}</div>
+<h5 class="mt-4">Quick tutorial</h5><ol><li>Open the Dashboard and start the live sensor stream.</li><li>Watch new readings, forecasts and alert pop-ups.</li><li>Open Map to see stations coloured by any metric.</li><li>Use Explore to compare stations and view correlations.</li><li>Run a scenario on Predict and read the "Why?" table.</li><li>Upload <code>testing_dataset.csv</code> on Ingestion and see the model retrain on Models.</li></ol>{% endblock %}

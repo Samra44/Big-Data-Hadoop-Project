@@ -1,0 +1,29 @@
+{% extends 'base.html' %}{% block content %}
+<h3>Explore Climate Data <small class="text-muted fs-6">customisable · live from the data store</small></h3>
+<div class="card card-body mb-3"><div class="row g-2 align-items-end">
+<div class="col-md-2"><label class="form-label small">Metric</label><select id="metric" class="form-select">{% for k,v in metric_labels.items() %}<option value="{{k}}">{{v}}</option>{% endfor %}</select></div>
+<div class="col-md-4"><label class="form-label small">Stations (Ctrl+click up to 6)</label><select id="st" class="form-select" multiple size="3">{% for s in stations_all %}<option value="{{s[0]}}" {{'selected' if s[0] in ['ST01','ST04','ST10']}}>{{s[1]}} · {{s[2]}}</option>{% endfor %}</select></div>
+<div class="col-md-2"><label class="form-label small">Aggregate</label><select id="agg" class="form-select"><option value="day">Daily</option><option value="month" selected>Monthly</option><option value="year">Yearly</option></select></div>
+<div class="col-md-1"><label class="form-label small">From</label><input id="start" type="date" class="form-control" value="2016-01-01"></div>
+<div class="col-md-1"><label class="form-label small">To</label><input id="end" type="date" class="form-control" value="2030-12-31"></div>
+<div class="col-md-2"><button class="btn btn-es w-100" onclick="series()">Update</button></div></div></div>
+<div class="card card-body mb-3"><h6 id="stitle">Time series</h6><canvas id="ts" height="90"></canvas><p class="small text-muted mb-0">Red points = periods containing detected anomalies.</p></div>
+<div class="row g-3">
+<div class="col-lg-7"><div class="card card-body"><div class="d-flex justify-content-between"><h6>Correlation analysis</h6>
+<select id="region" class="form-select form-select-sm w-auto" onchange="corr()"><option>All</option>{% for r in regions %}<option>{{r}}</option>{% endfor %}</select></div>
+<div class="table-responsive"><table class="corr" id="corr"></table></div></div></div>
+<div class="col-lg-5"><div class="card card-body"><h6>Warming trend by station (°C per decade)</h6><canvas id="trend" height="230"></canvas></div></div></div>
+<script>
+let tc,tr;
+async function series(){const sel=[...st.selectedOptions].map(o=>o.value); const p=new URLSearchParams({metric:metric.value,agg:agg.value,start:start.value,end:end.value}); sel.forEach(s=>p.append('station',s));
+ const d=await (await fetch('{{ url_for("api_series") }}?'+p)).json(); stitle.textContent=d.label+' – '+agg.options[agg.selectedIndex].text;
+ const keys=[...new Set(Object.values(d.series).flat().map(r=>r.k))].sort(); const name=Object.fromEntries([...st.options].map(o=>[o.value,o.text.split(' · ')[0]]));
+ const ds=Object.entries(d.series).map(([s,rows])=>{const m=Object.fromEntries(rows.map(r=>[r.k,r]));return {label:name[s],data:keys.map(k=>m[k]?m[k].v:null),spanGaps:true,pointRadius:keys.map(k=>m[k]&&m[k].a>0?4:0),pointBackgroundColor:'#b42318',borderWidth:1.5};});
+ if(tc)tc.destroy(); tc=new Chart(ts,{type:'line',data:{labels:keys,datasets:ds},options:{animation:false}});}
+async function corr(){const d=await (await fetch('{{ url_for("api_correlation") }}?region='+encodeURIComponent(region.value))).json();
+ const c=v=>v>=0?`rgba(232,89,12,${Math.abs(v)})`:`rgba(28,126,214,${Math.abs(v)})`;
+ document.getElementById('corr').innerHTML='<tr><td></td>'+d.labels.map(l=>`<td style="writing-mode:vertical-rl;height:110px">${l}</td>`).join('')+'</tr>'+d.matrix.map((row,i)=>`<tr><td style="width:auto;text-align:right;padding-right:6px">${d.labels[i]}</td>`+row.map(v=>`<td style="background:${c(v)};color:${Math.abs(v)>.6?'#fff':'#000'}">${v}</td>`).join('')+'</tr>').join('');}
+async function trend(){const d=await (await fetch('{{ url_for("api_trends") }}')).json();
+ tr=new Chart(document.getElementById('trend'),{type:'bar',data:{labels:d.map(r=>r.station),datasets:[{label:'°C / decade',data:d.map(r=>r.temp_c_per_decade),backgroundColor:d.map(r=>r.temp_c_per_decade>0?'#e8590c':'#1c7ed6')}]},options:{indexAxis:'y',animation:false}});}
+series(); corr(); trend();
+</script>{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block content %}
+<h3>User Management</h3>
+<div class="row g-3"><div class="col-lg-4"><div class="card card-body"><h6>Add user</h6><form method="post">
+<input name="username" class="form-control mb-2" placeholder="Username" required><input name="email" type="email" class="form-control mb-2" placeholder="Email">
+<input name="password" type="password" class="form-control mb-2" placeholder="Password" required minlength="8">
+<select name="role" class="form-select mb-2">{% for r in roles %}<option>{{r}}</option>{% endfor %}</select><button class="btn btn-es w-100">Create</button></form></div>
+<div class="card card-body mt-3 small"><b>Access control</b><br>admin – everything incl. users &amp; backups<br>analyst – ingestion, predictions, rules, models, monitoring<br>viewer – dashboards, map, explore, alerts (read-only), support</div></div>
+<div class="col-lg-8"><table class="table bg-white"><thead><tr><th>Username</th><th>Role</th><th>Email</th><th>Created</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{r.username}}</td><td>{{r.role}}</td><td>{{r.email}}</td><td class="small">{{r.created}}</td><td>{% if r.username!=session.user %}<form method="post"><button class="btn btn-sm btn-outline-danger" name="delete" value="{{r.username}}">Delete</button></form>{% endif %}</td></tr>{% endfor %}</tbody></table></div></div>{% endblock %}

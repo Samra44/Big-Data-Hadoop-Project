@@ -1,0 +1,16 @@
+{% extends 'base.html' %}{% block content %}
+<h3>Alert Rules <small class="text-muted fs-6">configurable thresholds · applied to every new reading in real time</small></h3>
+<table class="table table-sm bg-white align-middle"><thead><tr><th>Label</th><th>Condition</th><th>Region</th><th>Level</th><th>Threshold</th><th>Status</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr class="{{'text-muted' if not r.enabled}}"><td>{{r.label}}</td><td><code>{{r.metric}} {{r.operator}}</code></td><td>{{r.region}}</td><td><span class="badge lvl-{{r.level}}">{{r.level}}</span></td>
+<td><form method="post" class="d-flex gap-1"><input type="hidden" name="id" value="{{r.id}}"><input name="threshold" type="number" step="any" class="form-control form-control-sm" style="width:100px" value="{{r.threshold}}"><button class="btn btn-sm btn-outline-primary" name="action" value="update">Save</button></form></td>
+<td>{{'Enabled' if r.enabled else 'Disabled'}}</td><td class="d-flex gap-1"><form method="post"><input type="hidden" name="id" value="{{r.id}}"><button class="btn btn-sm btn-outline-secondary" name="action" value="toggle">{{'Disable' if r.enabled else 'Enable'}}</button></form>
+<form method="post"><input type="hidden" name="id" value="{{r.id}}"><button class="btn btn-sm btn-outline-danger" name="action" value="delete">Delete</button></form></td></tr>{% endfor %}</tbody></table>
+<div class="card card-body"><h6>Add rule</h6><form method="post" class="row g-2"><input type="hidden" name="action" value="add">
+<div class="col-md-3"><input name="label" class="form-control" placeholder="Label e.g. Karachi heat stress"></div>
+<div class="col-md-2"><select name="metric" class="form-select">{% for m in metrics %}<option>{{m}}</option>{% endfor %}</select></div>
+<div class="col-md-1"><select name="operator" class="form-select"><option>&gt;=</option><option>&lt;=</option><option>&gt;</option><option>&lt;</option></select></div>
+<div class="col-md-2"><input name="threshold" type="number" step="any" class="form-control" placeholder="Threshold" required></div>
+<div class="col-md-2"><select name="region" class="form-select">{% for r in regions %}<option>{{r}}</option>{% endfor %}</select></div>
+<div class="col-md-1"><select name="level" class="form-select"><option>Critical</option><option selected>High</option><option>Medium</option><option>Low</option></select></div>
+<div class="col-md-1"><button class="btn btn-es w-100">Add</button></div></form>
+<p class="small text-muted mt-2 mb-0">Critical/High alerts are pushed to the dashboard instantly and sent by e-mail / webhook when configured in <code>.env</code>.</p></div>{% endblock %}

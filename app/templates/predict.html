@@ -1,0 +1,19 @@
+{% extends 'base.html' %}{% block content %}
+<h3>Predictive Analysis</h3><p class="text-muted">Enter today's readings for a station. Blank fields are allowed – missing values are imputed.</p>
+<div class="row g-3"><div class="col-lg-6"><div class="card card-body"><form method="post">
+<div class="row g-2"><div class="col-6"><label class="form-label small">Station</label><select name="station_id" class="form-select">{% for s in stations_all %}<option value="{{s[0]}}" {{'selected' if f.get('station_id')==s[0]}}>{{s[1]}} ({{s[2]}})</option>{% endfor %}</select></div>
+<div class="col-6"><label class="form-label small">Date</label><input type="date" name="date" class="form-control" value="{{ f.get('date','2024-06-10') }}" required></div>
+{% set d = {'temperature_c':42,'temp_max_c':48,'temp_min_c':33,'humidity_pct':20,'precipitation_mm':0,'wind_speed_kmh':14,'pressure_hpa':996,'co2_ppm':425,'pm25_ugm3':60,'ndvi':0.2,'land_surface_temp_c':51,'soil_moisture_pct':10} %}
+{% for k,v in metric_labels.items() %}<div class="col-4"><label class="form-label small">{{v}}</label><input name="{{k}}" step="any" type="number" class="form-control form-control-sm" value="{{ f.get(k, d[k]) }}"></div>{% endfor %}</div>
+<button class="btn btn-es mt-3 w-100">Run models</button></form></div></div>
+<div class="col-lg-6">{% if res %}<div class="card card-body">
+<div class="row text-center mb-2"><div class="col"><div class="small text-muted">Predicted event</div><div class="fs-3 fw-bold text-capitalize">{{res.event}}</div></div>
+<div class="col"><div class="small text-muted">Extreme-event probability</div><div class="fs-3 fw-bold {{'text-danger' if res.prob>=70}}">{{res.prob}}%</div></div>
+<div class="col"><div class="small text-muted">Anomaly</div><div class="fs-3 fw-bold">{{'⚠ Yes' if res.anomaly else 'No'}}</div><div class="small">max |z| = {{res.z}}</div></div>
+<div class="col"><div class="small text-muted">Forecast {{res.fdate}}</div><div class="fs-3 fw-bold">{{res.forecast}} °C</div></div></div>
+<h6>Why? – contribution of each reading vs the station's normal for this month</h6>
+<table class="table table-sm"><thead><tr><th>Reading</th><th>Value</th><th>Normal</th><th>Effect on event probability</th></tr></thead><tbody>
+{% for x in res.factors %}<tr><td>{{metric_labels[x.feature]}}</td><td>{{x.value}}</td><td>{{x.normal}}</td>
+<td><div class="d-flex align-items-center gap-2"><div style="height:10px;width:{{ ([x.impact|abs*2,200]|min)|int }}px;background:{{'#e8590c' if x.impact>0 else '#138a72'}}"></div>{{'+' if x.impact>0}}{{x.impact}} pts</div></td></tr>{% endfor %}</tbody></table>
+<p class="small text-muted mb-0">Scored by model v{{res.version}}. Forecast uses the station's last 9 days from the data store plus this reading.</p></div>
+{% else %}<div class="card card-body text-muted">Results appear here. The default values describe a severe heatwave day.</div>{% endif %}</div></div>{% endblock %}

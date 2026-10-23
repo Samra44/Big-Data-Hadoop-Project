@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+app/*.db
+ml/registry/
+backups/
+app/uploads/
+docs/
+*.docx
+dashboard/*.csv
+.git/

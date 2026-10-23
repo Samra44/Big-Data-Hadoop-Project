@@ -1,0 +1,73 @@
+region,month,forecast_temp_c
+Balochistan,Jan 2024,13.3
+Balochistan,Feb 2024,14.5
+Balochistan,Mar 2024,17.6
+Balochistan,Apr 2024,21.8
+Balochistan,May 2024,25.9
+Balochistan,Jun 2024,28.9
+Balochistan,Jul 2024,30.0
+Balochistan,Aug 2024,28.8
+Balochistan,Sep 2024,25.7
+Balochistan,Oct 2024,21.5
+Balochistan,Nov 2024,17.4
+Balochistan,Dec 2024,14.4
+Federal,Jan 2024,12.4
+Federal,Feb 2024,13.7
+Federal,Mar 2024,17.3
+Federal,Apr 2024,22.1
+Federal,May 2024,26.8
+Federal,Jun 2024,30.3
+Federal,Jul 2024,31.5
+Federal,Aug 2024,30.1
+Federal,Sep 2024,26.6
+Federal,Oct 2024,21.8
+Federal,Nov 2024,17.1
+Federal,Dec 2024,13.6
+Gilgit-Baltistan,Jan 2024,4.2
+Gilgit-Baltistan,Feb 2024,5.8
+Gilgit-Baltistan,Mar 2024,10.1
+Gilgit-Baltistan,Apr 2024,15.9
+Gilgit-Baltistan,May 2024,21.6
+Gilgit-Baltistan,Jun 2024,25.8
+Gilgit-Baltistan,Jul 2024,27.3
+Gilgit-Baltistan,Aug 2024,25.7
+Gilgit-Baltistan,Sep 2024,21.5
+Gilgit-Baltistan,Oct 2024,15.7
+Gilgit-Baltistan,Nov 2024,9.9
+Gilgit-Baltistan,Dec 2024,5.7
+Khyber Pakhtunkhwa,Jan 2024,10.7
+Khyber Pakhtunkhwa,Feb 2024,12.1
+Khyber Pakhtunkhwa,Mar 2024,15.6
+Khyber Pakhtunkhwa,Apr 2024,20.4
+Khyber Pakhtunkhwa,May 2024,25.1
+Khyber Pakhtunkhwa,Jun 2024,28.6
+Khyber Pakhtunkhwa,Jul 2024,29.8
+Khyber Pakhtunkhwa,Aug 2024,28.5
+Khyber Pakhtunkhwa,Sep 2024,24.9
+Khyber Pakhtunkhwa,Oct 2024,20.2
+Khyber Pakhtunkhwa,Nov 2024,15.4
+Khyber Pakhtunkhwa,Dec 2024,12.0
+Punjab,Jan 2024,15.0
+Punjab,Feb 2024,16.5
+Punjab,Mar 2024,20.5
+Punjab,Apr 2024,25.9
+Punjab,May 2024,31.2
+Punjab,Jun 2024,35.1
+Punjab,Jul 2024,36.4
+Punjab,Aug 2024,34.9
+Punjab,Sep 2024,31.0
+Punjab,Oct 2024,25.6
+Punjab,Nov 2024,20.2
+Punjab,Dec 2024,16.4
+Sindh,Jan 2024,18.9
+Sindh,Feb 2024,20.1
+Sindh,Mar 2024,23.4
+Sindh,Apr 2024,27.8
+Sindh,May 2024,32.2
+Sindh,Jun 2024,35.4
+Sindh,Jul 2024,36.5
+Sindh,Aug 2024,35.3
+Sindh,Sep 2024,32.1
+Sindh,Oct 2024,27.6
+Sindh,Nov 2024,23.2
+Sindh,Dec 2024,20.0

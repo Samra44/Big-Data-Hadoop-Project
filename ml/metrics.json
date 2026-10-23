@@ -1,0 +1,154 @@
+{
+  "training": {
+    "forecast": {
+      "cv_mae": {
+        "Ridge": 1.387,
+        "RandomForest": 1.391,
+        "HistGradientBoosting": 1.407
+      },
+      "best": "Ridge",
+      "test_mae": 1.348,
+      "test_r2": 0.939,
+      "persistence_mae": 1.708
+    },
+    "event": {
+      "cv_f1_macro": {
+        "RandomForest": 0.7735,
+        "HistGradientBoosting": 0.7336
+      },
+      "best": "RandomForest",
+      "test_accuracy": 0.9899,
+      "test_f1_macro": 0.8418,
+      "per_class_f1": {
+        "flood": 0.8,
+        "heatwave": 0.883,
+        "none": 0.995,
+        "smog": 0.59,
+        "storm": 0.941
+      }
+    },
+    "anomaly": {
+      "flagged_test": 208,
+      "true_anomalies_test": 125,
+      "precision": 0.255,
+      "recall": 0.424
+    },
+    "trends_mean_c_per_decade": 0.41,
+    "seasonal_regions": [
+      "Balochistan",
+      "Federal",
+      "Gilgit-Baltistan",
+      "Khyber Pakhtunkhwa",
+      "Punjab",
+      "Sindh"
+    ]
+  },
+  "external_test_2024": {
+    "external_test_event_f1_macro": 0.9106,
+    "external_test_event_report": {
+      "flood": {
+        "precision": 0.9636363636363636,
+        "recall": 0.9380530973451328,
+        "f1-score": 0.9506726457399103,
+        "support": 113.0
+      },
+      "heatwave": {
+        "precision": 0.9724770642201835,
+        "recall": 0.9085714285714286,
+        "f1-score": 0.9394387001477105,
+        "support": 350.0
+      },
+      "none": {
+        "precision": 0.9790301441677588,
+        "recall": 0.9946737683089214,
+        "f1-score": 0.9867899603698811,
+        "support": 3755.0
+      },
+      "smog": {
+        "precision": 0.9146341463414634,
+        "recall": 0.6198347107438017,
+        "f1-score": 0.7389162561576355,
+        "support": 121.0
+      },
+      "storm": {
+        "precision": 0.896551724137931,
+        "recall": 0.9811320754716981,
+        "f1-score": 0.9369369369369369,
+        "support": 53.0
+      },
+      "accuracy": 0.9758652094717668,
+      "macro avg": {
+        "precision": 0.9452658885007402,
+        "recall": 0.8884530160881965,
+        "f1-score": 0.9105508998704149,
+        "support": 4392.0
+      },
+      "weighted avg": {
+        "precision": 0.9753424512760782,
+        "recall": 0.9758652094717668,
+        "f1-score": 0.9746567349412442,
+        "support": 4392.0
+      }
+    },
+    "external_test_forecast_mae": 1.697,
+    "external_test_anomaly_precision": 0.787,
+    "external_test_anomaly_recall": 0.581
+  },
+  "trends": {
+    "ST01": {
+      "temp_c_per_decade": 0.44,
+      "co2_ppm_per_year": 2.39
+    },
+    "ST02": {
+      "temp_c_per_decade": 0.67,
+      "co2_ppm_per_year": 2.4
+    },
+    "ST03": {
+      "temp_c_per_decade": 0.29,
+      "co2_ppm_per_year": 2.38
+    },
+    "ST04": {
+      "temp_c_per_decade": 0.71,
+      "co2_ppm_per_year": 2.4
+    },
+    "ST05": {
+      "temp_c_per_decade": 0.4,
+      "co2_ppm_per_year": 2.39
+    },
+    "ST06": {
+      "temp_c_per_decade": 0.14,
+      "co2_ppm_per_year": 2.41
+    },
+    "ST07": {
+      "temp_c_per_decade": 0.54,
+      "co2_ppm_per_year": 2.39
+    },
+    "ST08": {
+      "temp_c_per_decade": 0.36,
+      "co2_ppm_per_year": 2.4
+    },
+    "ST09": {
+      "temp_c_per_decade": 0.15,
+      "co2_ppm_per_year": 2.42
+    },
+    "ST10": {
+      "temp_c_per_decade": 0.32,
+      "co2_ppm_per_year": 2.41
+    },
+    "ST11": {
+      "temp_c_per_decade": 0.56,
+      "co2_ppm_per_year": 2.41
+    },
+    "ST12": {
+      "temp_c_per_decade": 0.36,
+      "co2_ppm_per_year": 2.4
+    }
+  },
+  "runtime": {
+    "python": "3.12.15",
+    "platform": "Linux-6.12.110+-aarch64-with-glibc2.41",
+    "cpu_cores": 2,
+    "machine": "aarch64",
+    "sklearn": "1.9.1"
+  }
+}

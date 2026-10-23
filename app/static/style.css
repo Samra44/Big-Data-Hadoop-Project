@@ -1,0 +1,8 @@
+body{background:#f3f7f5}.bg-es{background:linear-gradient(90deg,#0b4f4a,#138a72)}
+.btn-es{background:#138a72;color:#fff}.btn-es:hover{background:#0b4f4a;color:#fff}
+.kpi{border:0;border-left:4px solid #138a72;box-shadow:0 1px 4px rgba(0,0,0,.06)}.card{border-radius:10px;border:0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.live-dot{animation:blink 1.2s infinite}@keyframes blink{50%{opacity:.4}}
+.lvl-Critical{background:#b42318;color:#fff}.lvl-High{background:#e8590c;color:#fff}.lvl-Medium{background:#f2b134}.lvl-Low{background:#adb5bd}
+.login-bg{background:linear-gradient(135deg,#0b4f4a,#138a72 60%,#7bc8a4);min-height:100vh}
+.corr td{width:48px;height:34px;text-align:center;font-size:.75rem}
+#map{height:600px;border-radius:10px}
